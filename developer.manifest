@@ -1,0 +1,14 @@
+CACHE MANIFEST
+#2016-02-07
+
+CACHE:
+index.html
+info.html
+css/style.css
+images/background.png
+
+NETWORK:
+login.php
+
+FALLBACK:
+*.html offline.html
