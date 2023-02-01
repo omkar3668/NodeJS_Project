@@ -1,7 +1,8 @@
 const mongoose=require('mongoose');
 const express=require('express');
-
+const jwt = require("jsonwebtoken");
 const app = express();
+const secretKey = "secretKey"
 
 app.use(express.json());
 
@@ -34,9 +35,41 @@ app.post("/post",async(req,res)=>{
     });
 
     const val =await data.save();
-    res.send("posted");
+    // res.send("posted");
+
+    jwt.sign({data},secretKey,(err,token)=>{
+      res.json({
+        token
+      })
+    })
 })
 
+app.post("/profile",verifyToken,(req,res)=>{
+    jwt.verify(req.token,secretKey,(err, data)=>{
+        if(err){
+            res.send({result:"invalid token"})
+        } else {
+            res.json({
+                message: "profile accessed",
+                data
+            })
+        }
+    })
+})
+
+function verifyToken(req,res,next){
+  const bearerHeader = req.headers['authorization'];
+  if( typeof bearerHeader !== 'undefined' ){
+    const bearer = bearerHeader.split(" ");
+    const token = bearer[1];
+    req.token = token;
+    next();
+  }else{
+    res.send({
+        result:'Token is not valid'
+    })
+  }
+}
 
 // GET
 
