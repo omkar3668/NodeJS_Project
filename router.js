@@ -1,6 +1,8 @@
 const express = require("express");
 const route = express.Router();
 const accounts= require("./database");
+const swaggerJsDoc = require('swagger-jsdoc');
+const swaggerUi = require('swagger-ui-express');
 
 route.get('/',(req,res)=>{
     res.sendFile(__dirname + '/index.html');
@@ -16,12 +18,39 @@ route.get('/contact',(req,res)=>{
     res.sendFile(__dirname + '/contact.html');
 })
 
+const swaggerOptions ={
+    swaggerDefinition: {
+        info: {
+            version: "1.0.0",
+            title: "Account API",
+            description: "Account API Information",
+            contact: {
+              name: "Account Info"
+            },
+            servers: ["http://localhost:3000"]
+          }
+    },
+    apis: ["router.js"]
+};
+
+const swaggerDocs = swaggerJsDoc(swaggerOptions);
+route.use("/api-docs", swaggerUi.serve, swaggerUi.setup(swaggerDocs));
+
+//swagger
+/**
+ * @swagger
+ * /accounts:
+ *  get:
+ *    description: Use to request all accounts
+ *    responses:
+ *      '200':
+ *        description: A successful response
+ */
 // get request
 route.get('/accounts',(req,res)=>{
     res.json({userData:accounts});
 });
 
-//post request
 route.post('/accounts',(req,res)=>{
     const incomingAccount = req.body
     accounts.push(incomingAccount);
@@ -37,6 +66,33 @@ route.get('/accounts/:id',(req,res)=>{
          res.json({userData:[getAccount]});
     }
 });
+
+/**
+ * @swagger
+ * /customers:
+ *  get:
+ *    description: Use to request all customers
+ *    responses:
+ *      '200':
+ *        description: A successful response
+ */
+route.get("/customers", (req, res) => {
+    res.status(200).send("Customer results");
+  });
+  
+/**
+ * @swagger
+ * /customer:
+ *  put:
+ *    description: Use to request all customers
+ *    responses:
+ *      '200':
+ *        description: A successful response
+ */
+route.put("/customer", (req, res) => {
+    res.status(200).send("Successfully updated customer");
+  });
+
 
 route.get('*',(req,res)=>{
     res.send('sorry this is invalid url');
